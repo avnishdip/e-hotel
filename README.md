@@ -1,193 +1,126 @@
-# CSI 2132 Project e-Hotel
+# Hotel Management System
 
-## Project Overview
-The e-Hotels system is a collaborative platform for five major hotel chains in North America, enabling real-time room booking and management across their properties. This system provides both customer-facing booking capabilities and employee-facing management tools.
+A web-based hotel management system that allows hotel employees to manage bookings and rentings.
+
+## Features
+
+- User authentication (employees and customers)
+- Hotel chain and hotel management
+- Room management
+- Booking management
+- Renting management
+- Payment processing
 
 ## Technologies Used
-- **Backend**: Node.js with Express.js
-- **Database**: SQLite3
-- **Frontend**: React with Material-UI
-- **Authentication**: JWT (JSON Web Tokens)
-- **Development Tools**: Vite, TypeScript
 
-## Installation Guide
+- Frontend: React, TypeScript, Vite
+- Backend: Node.js, Express
+- Database: SQLite
 
-### Prerequisites
-- Node.js (v14 or higher)
-- npm (v6 or higher)
+## Project Structure
 
-### Setup Steps
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd e-hotels
+```
+hotel-management-system/
+├── backend/                # Backend server
+│   ├── data/               # Database files
+│   ├── scripts/            # Database setup scripts
+│   └── src/                # Source code
+│       ├── controllers/    # Request handlers
+│       ├── middleware/     # Express middleware
+│       ├── models/         # Data models
+│       ├── routes/         # API routes
+│       └── server.js       # Entry point
+└── frontend/               # Frontend application
+    ├── public/             # Static assets
+    └── src/                # Source code
+        ├── components/     # React components
+        ├── pages/          # Page components
+        ├── services/       # API services
+        └── App.tsx         # Entry point
 ```
 
-2. Backend Setup:
-```bash
-cd backend
-npm install
-npm run init-db  # Initializes database with schema and sample data
-npm run dev      # Starts development server on port 5000
-```
+## Setup Instructions
 
-3. Frontend Setup:
-```bash
-cd frontend
-npm install
-npm run dev      # Starts development server on port 5173
-```
+### Backend Setup
 
-## Database Implementation
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
 
-### Schema Overview
-The database consists of the following main tables:
-- HOTEL_CHAIN
-- HOTEL
-- ROOM
-- CUSTOMER
-- EMPLOYEE
-- BOOKING
-- RENTING
-- ARCHIVE
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-### Key Database Features
+3. Set up the database:
+   ```
+   node scripts/fresh-setup.js
+   ```
 
-#### 1. Views
-- **available_rooms_per_area**: Shows number of available rooms by location
-- **hotel_room_capacity**: Aggregates room capacity statistics per hotel
-- **room_availability**: Real-time room availability status
-- **hotel_statistics**: Performance metrics for each hotel
-- **employee_performance**: Employee activity tracking
+4. Start the server:
+   ```
+   npm run dev
+   ```
 
-#### 2. Triggers
-- **after_hotel_insert/delete**: Maintains hotel count in chains
-- **after_renting_insert**: Updates booking status on renting
-- **before_booking_insert**: Prevents double bookings
-- **before_renting_insert**: Prevents overlapping rentings
+### Frontend Setup
 
-#### 3. Indexes
-```sql
-CREATE INDEX idx_room_hotel ON room(hotel_id);
-CREATE INDEX idx_booking_dates ON booking(start_date, end_date);
-CREATE INDEX idx_hotel_location ON hotel(address);
-```
+1. Navigate to the frontend directory:
+   ```
+   cd frontend
+   ```
 
-### Sample Queries
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-1. Available Rooms Search (with aggregation):
-```sql
-SELECT h.name, COUNT(r.room_id) as available_rooms, AVG(r.price) as avg_price
-FROM hotel h
-JOIN room r ON h.hotel_id = r.hotel_id
-WHERE r.room_id NOT IN (
-    SELECT room_id FROM booking 
-    WHERE booking_status != 'cancelled'
-    AND current_date BETWEEN start_date AND end_date
-)
-GROUP BY h.hotel_id;
-```
+3. Start the development server:
+   ```
+   npm run dev
+   ```
 
-2. Nested Query for Hotel Occupancy:
-```sql
-SELECT h.name, 
-    (SELECT COUNT(*) 
-     FROM renting r 
-     WHERE r.hotel_id = h.hotel_id 
-     AND current_date BETWEEN r.start_date AND r.end_date
-    ) as current_occupancy
-FROM hotel h;
-```
+## Usage
 
-## Application Features
+1. Open your browser and navigate to http://localhost:5173
+2. Log in with the following credentials:
+   - Employee: john.manager@luxurystays.com / password123
+   - Customer: alice@example.com / password123
 
-### Customer Features
-1. Account Management
-   - Registration
-   - Login/Logout
-   - Profile management
+## API Endpoints
 
-2. Room Booking
-   - Search with multiple criteria
-   - Real-time availability checking
-   - Booking management
+### Authentication
+- POST /api/auth/login - User login
+- POST /api/auth/register - User registration
 
-### Employee Features
-1. Booking Management
-   - Convert bookings to rentings
-   - Direct room rental
-   - Payment processing
+### Hotels
+- GET /api/hotels - Get all hotels
+- GET /api/hotels/:id - Get hotel by ID
 
-2. Hotel Management
-   - Room status updates
-   - Customer management
-   - Booking/renting reports
+### Rooms
+- GET /api/rooms/hotel/:hotelId - Get rooms by hotel ID
 
-## Security Implementation
+### Bookings
+- GET /api/bookings/hotel/:hotelId - Get bookings by hotel ID
+- POST /api/bookings - Create a new booking
+- PUT /api/bookings/:id - Update booking status
 
-1. Authentication
-   - JWT-based authentication
-   - Role-based access control
-   - Session management
+### Rentings
+- GET /api/rentings/hotel/:hotelId - Get rentings by hotel ID
+- POST /api/rentings - Create a new renting
+- PUT /api/rentings/:id/payment - Process payment for a renting
 
-2. Data Protection
-   - Password hashing
-   - Input validation
-   - SQL injection prevention
+## Database Schema
 
-## Testing
+The system uses the following database tables:
+- hotel_chain
+- hotel
+- room
+- employee
+- customer
+- booking
+- renting
 
-### Database Testing
-- Integrity constraints validation
-- Trigger functionality testing
-- View accuracy verification
+## Author
 
-### Application Testing
-- API endpoint testing
-- User interface testing
-- Authentication flow testing
-
-## Performance Optimizations
-
-1. Database Optimizations
-   - Strategic indexing
-   - Query optimization
-   - Connection pooling
-
-2. Application Optimizations
-   - React component optimization
-   - API response caching
-   - Lazy loading
-
-## Future Enhancements
-1. Additional Features
-   - Mobile application
-   - Email notifications
-   - Payment gateway integration
-
-2. Technical Improvements
-   - Real-time updates using WebSocket
-   - Enhanced reporting capabilities
-   - Advanced search filters
-
-## Video Presentation Timestamps
-
-| Section | Start Time |
-|---------|------------|
-| Technologies Overview | 00:00 |
-| Database Schema | 02:00 |
-| Integrity Constraints | 04:00 |
-| Data Population | 06:00 |
-| SQL Queries Demo | 08:00 |
-| Triggers Demo | 10:00 |
-| Indexes Overview | 12:00 |
-| Views Demo | 13:00 |
-| UI Walkthrough | 14:00 |
-
-## Contributors
-- [Student Name]
-- Student ID: [ID]
-- Course: CSI2132 Databases I
-- Professor: Verena Kantere
-- Winter 2024-25
+[Your Name]

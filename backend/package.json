@@ -1,13 +1,11 @@
 {
-  "name": "ehotels-backend",
+  "name": "hotel-management-backend",
   "version": "1.0.0",
-  "description": "Backend server for e-Hotels system",
+  "description": "Backend server for Hotel Management System",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "test": "jest",
-    "init-db": "node scripts/init-db.js"
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -20,7 +18,6 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "jest": "^29.4.3",
     "nodemon": "^2.0.20"
   }
 }

@@ -3,6 +3,34 @@ const router = express.Router();
 const db = require('../config/db');
 const { authenticateToken, authorizeCustomer, authorizeEmployee } = require('../middleware/auth.middleware');
 
+// Get bookings by hotel ID
+router.get('/hotel/:hotelId', authenticateToken, authorizeEmployee, (req, res) => {
+    const hotelId = req.params.hotelId;
+    
+    db.all(
+        `SELECT b.*, c.full_name as customer_name, r.room_number
+         FROM booking b
+         JOIN customer c ON b.customer_id = c.customer_id
+         JOIN room r ON b.room_id = r.room_id
+         WHERE b.hotel_id = ?
+         ORDER BY b.created_at DESC`,
+        [hotelId],
+        (err, bookings) => {
+            if (err) {
+                console.error('Error fetching hotel bookings:', err);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Error fetching hotel bookings'
+                });
+            }
+            res.json({
+                success: true,
+                data: bookings
+            });
+        }
+    );
+});
+
 // Get customer's bookings
 router.get('/customer', authenticateToken, authorizeCustomer, (req, res) => {
     const customerId = req.user.id;
