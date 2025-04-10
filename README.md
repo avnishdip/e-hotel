@@ -121,6 +121,4 @@ The system uses the following database tables:
 - booking
 - renting
 
-## Author
 
-Avnish Dip
